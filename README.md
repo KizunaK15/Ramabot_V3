@@ -1,9 +1,102 @@
-## Robot Package Template
+<div align="center">
 
-This Robot works on Ros2 Humble
+# 🤖 RAMABOT V3
+**Autonomous Medical Receptionist Robot**
 
-This is a GitHub template. You can make your own copy by clicking the green "Use this template" button.
+![ROS 2 Humble](https://img.shields.io/badge/ROS_2-Humble-22314E?style=for-the-badge&logo=ros&logoColor=white)
+![C++](https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Hardware](https://img.shields.io/badge/Hardware-ESP32_%7C_RealSense_D435-orange?style=for-the-badge)
 
-It is recommended that you keep the repo/package name the same, but if you do change it, ensure you do a "Find all" using your IDE (or the built-in GitHub IDE by hitting the `.` key) and rename all instances of `my_bot` to whatever your project's name is.
+</div>
 
-Note that each directory currently has at least one file in it to ensure that git tracks the files (and, consequently, that a fresh clone has direcctories present for CMake to find). These example files can be removed if required (and the directories can be removed if `CMakeLists.txt` is adjusted accordingly).
+## 📌 Deskripsi Proyek
+
+**RAMABOT V3** adalah robot resepsionis medis otonom berbasis arsitektur *2-wheel differential drive*. Paket ROS 2 ini mencakup sistem navigasi, simulasi, dan integrasi *hardware* tingkat rendah untuk interaksi pasien. Robot ini memanfaatkan sensor penglihatan mendalam (*depth camera*) untuk pelacakan manusia secara empiris, serta bertindak sebagai *gateway* lokal untuk perangkat diagnostik medis.
+
+## ✨ Fitur Utama
+
+- 🎯 **Human Tracking:** Pelacakan objek dan pasien secara presisi menggunakan **Intel RealSense D435**.
+- 🏥 **Medical BLE Gateway:** Integrasi mikrokontroler untuk *parsing* data Bluetooth Low Energy (BLE) secara *real-time* dari perangkat medis seperti **Yuwell SpO2/BPM, Termometer Tubuh, dan Tensimeter BP-YE670CR**.
+- 🗺️ **Autonomous Navigation:** Pemetaan dan navigasi mandiri menggunakan Nav2 dan SLAM Toolbox (didukung *map server* dan *transform tree* yang optimal).
+- 💻 **Simulation Ready:** Konfigurasi SDF/URDF lengkap untuk simulasi Gazebo dan visualisasi RViz2 tanpa *crash*.
+
+---
+
+## 🛠️ Arsitektur & Spesifikasi
+
+### Stack Perangkat Lunak
+
+| Komponen | Teknologi |
+| :--- | :--- |
+| **OS & Framework** | Ubuntu 22.04 + ROS 2 Humble |
+| **Middleware** | `rmw_fastrtps_cpp` |
+| **Network Security** | `ROS_LOCALHOST_ONLY=1` (isolasi jaringan OTA) |
+| **Bahasa Node** | Python 3 & C++ |
+
+### Stack Perangkat Keras
+
+| Komponen | Spesifikasi |
+| :--- | :--- |
+| **SBC / Host** | Linux Development Node (env `raka01`) |
+| **Low-level Controller** | ESP32 (firmware berbasis C++/Arduino, di-*flash* via `esptool`) |
+| **Kinematika** | Differential Drive (links: `base_link`, `left_wheel`, `right_wheel`, `laser_frame`) |
+
+---
+
+## 🚀 Instalasi & Persiapan (*Setup*)
+
+### 1. Prasyarat
+
+Pastikan ROS 2 Humble, Nav2, dan Gazebo sudah terinstal. Lalu konfigurasikan *environment* untuk FastRTPS:
+
+```bash
+export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+export ROS_LOCALHOST_ONLY=1
+```
+
+### 2. Kloning Repositori
+
+Tarik repositori langsung ke dalam *workspace*:
+
+```bash
+mkdir -p ~/ramabot_ws/src
+cd ~/ramabot_ws/src
+git clone https://github.com/KizunaK15/Ramabot_V3.git ramabot
+```
+
+### 3. Kompilasi (*Build*)
+
+```bash
+cd ~/ramabot_ws
+colcon build --symlink-install
+source install/setup.bash
+```
+
+---
+
+## 🕹️ Penggunaan (*Usage*)
+
+### Mode Simulasi (Gazebo + RViz2)
+
+Untuk menguji model robot, lingkungan *maze*, dan memastikan *transform tree* berjalan sempurna:
+
+```bash
+ros2 launch ramabot sim_launch.py
+```
+
+### Navigasi & Pemetaan
+
+Untuk menjalankan node pemetaan SLAM:
+
+```bash
+ros2 launch ramabot slam_launch.py
+```
+
+### Jembatan Komunikasi Hardware
+
+Untuk menghubungkan perintah gerak ROS 2 ke motor ESP32 (memperbaiki logika kontrol matriks pergerakan):
+
+```bash
+ros2 run ramabot serial_to_cmd_vel.py
+```
