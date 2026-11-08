@@ -6,7 +6,8 @@
 ![ROS 2 Humble](https://img.shields.io/badge/ROS_2-Humble-22314E?style=for-the-badge&logo=ros&logoColor=white)
 ![C++](https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Hardware](https://img.shields.io/badge/Hardware-ESP32_%7C_RealSense_D435-orange?style=for-the-badge)
+![ESP32](https://img.shields.io/badge/ESP32-E7352C?style=for-the-badge&logo=espressif&logoColor=white)
+![Intel RealSense](https://img.shields.io/badge/Intel_RealSense-D435-0071C5?style=for-the-badge&logo=intel&logoColor=white)
 
 </div>
 
