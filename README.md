@@ -1,7 +1,7 @@
 <div align="center">
 
 # 🤖 RAMABOT V3
-**Autonomous Medical Receptionist Robot**
+**Robot Autonomous Medical Asistant**
 
 ![ROS 2 Humble](https://img.shields.io/badge/ROS_2-Humble-22314E?style=for-the-badge&logo=ros&logoColor=white)
 ![C++](https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)
