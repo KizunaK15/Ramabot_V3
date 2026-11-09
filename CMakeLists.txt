@@ -45,7 +45,7 @@ install(DIRECTORY
 
 # Blok kedua: Untuk menginstal script Python ke direktori lib (PISAHKAN DI SINI)
 install(PROGRAMS
-  serial_to_cmd_vel.py
+  scripts/serial_to_cmd_vel.py
   DESTINATION lib/${PROJECT_NAME}
   RENAME serial_to_cmd_vel
 )
