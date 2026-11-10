@@ -18,7 +18,7 @@
 ## ✨ Fitur Utama
 
 - 🎯 **Human Tracking:** Pelacakan objek dan pasien secara presisi menggunakan **Intel RealSense D435**.
-- 🏥 **Medical BLE Gateway:** Integrasi mikrokontroler untuk *parsing* data Bluetooth Low Energy (BLE) secara *real-time* dari perangkat medis seperti **Yuwell SpO2/BPM, Termometer Tubuh, dan Tensimeter BP-YE670CR**.
+- 🏥 **Medical BLE Gateway:** Integrasi mikrokontroler untuk *parsing* data Bluetooth Low Energy (BLE) secara *real-time* dari perangkat medis seperti **Yuwell YX110 SpO2/BPM, Termometer YE670CR, dan Tensimeter YHW-6**.
 - 🗺️ **Autonomous Navigation:** Pemetaan dan navigasi mandiri menggunakan Nav2 dan SLAM Toolbox (didukung *map server* dan *transform tree* yang optimal).
 - 💻 **Simulation Ready:** Konfigurasi SDF/URDF lengkap untuk simulasi Gazebo dan visualisasi RViz2 tanpa *crash*.
 
