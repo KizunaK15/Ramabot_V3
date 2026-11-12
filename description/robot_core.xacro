@@ -9,16 +9,16 @@
     <xacro:property name="chassis_mass"     value="1.5" />
     <xacro:property name="wheel_radius"     value="0.075" />
     <xacro:property name="wheel_thickness"  value="0.04" />
-    <xacro:property name="wheel_mass"       value="0.05" />
+    <xacro:property name="wheel_mass"       value="0.5" />
     <xacro:property name="wheel_offset_x"   value="0.35" />
     <xacro:property name="wheel_offset_y"   value="0.205" />
     <xacro:property name="wheel_offset_z"   value="-0.02" />
 
     <xacro:property name="caster_wheel_radius"      value="0.01" />
-    <xacro:property name="caster_wheel_mass"        value="0.1" />
-    <xacro:property name="caster_wheel_offset_x"    value="0.02" />
-    <xacro:property name="caster_wheel_offset_z"    value="${wheel_offset_z - wheel_radius + caster_wheel_radius}" />
-   
+    <xacro:property name="caster_wheel_mass"        value="0.01" />
+    <!-- Clearance 2 mm agar 100% beban diam bertumpu pada roda penggerak -->
+    <xacro:property name="caster_wheel_offset_z"    value="${wheel_offset_z - wheel_radius + caster_wheel_radius + 0.002}" />
+
     <material name="white">
         <color rgba="1 1 1 1" />
     </material>
@@ -40,26 +40,18 @@
     </material>
 
     <!-- BASE LINK -->
-
-    <link name="base_link">
-
-    </link>
+    <link name="base_link" />
 
     <!-- BASE_FOOTPRINT LINK -->
-
     <joint name="base_footprint_joint" type="fixed">
         <parent link="base_link" />
         <child link="base_footprint" />
         <origin xyz="0 0 0" rpy="0 0 0" />
     </joint>
 
-    <link name="base_footprint">
-
-    </link>
-
+    <link name="base_footprint" />
 
     <!-- CHASSIS LINK -->
-
     <joint name="chassis_joint" type="fixed">
         <parent link="base_link" />
         <child link="chassis" />
@@ -80,7 +72,7 @@
                 <box size="${chassis_length} ${chassis_width} ${chassis_height}" />
             </geometry>
         </collision>
-        <xacro:inertial_box mass="0.5" x="${chassis_length}" y="${chassis_width}"
+        <xacro:inertial_box mass="${chassis_mass}" x="${chassis_length}" y="${chassis_width}"
             z="${chassis_height}">
             <origin xyz="${chassis_length/2} 0 ${chassis_height/2}" rpy="0 0 0" />
         </xacro:inertial_box>
@@ -91,7 +83,6 @@
     </gazebo>
 
     <!-- LEFT WHEEL LINK -->
-
     <joint name="left_wheel_joint" type="continuous">
         <parent link="base_link" />
         <child link="left_wheel" />
@@ -108,7 +99,7 @@
         </visual>
         <collision>
             <geometry>
-                <sphere radius="${wheel_radius}" />
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}" />
             </geometry>
         </collision>
         <xacro:inertial_cylinder mass="${wheel_mass}" length="${wheel_thickness}"
@@ -119,11 +110,14 @@
 
     <gazebo reference="left_wheel">
         <material>Gazebo/Black</material>
+        <mu1 value="1.5" />
+        <mu2 value="1.5" />
+        <kp value="1000000.0" />
+        <kd value="100.0" />
+        <minDepth>0.001</minDepth>
     </gazebo>
 
-
     <!-- RIGHT WHEEL LINK -->
-
     <joint name="right_wheel_joint" type="continuous">
         <parent link="base_link" />
         <child link="right_wheel" />
@@ -140,7 +134,7 @@
         </visual>
         <collision>
             <geometry>
-                <sphere radius="${wheel_radius}" />
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}" />
             </geometry>
         </collision>
         <xacro:inertial_cylinder mass="${wheel_mass}" length="${wheel_thickness}"
@@ -151,12 +145,14 @@
 
     <gazebo reference="right_wheel">
         <material>Gazebo/Black</material>
+        <mu1 value="1.5" />
+        <mu2 value="1.5" />
+        <kp value="1000000.0" />
+        <kd value="100.0" />
+        <minDepth>0.001</minDepth>
     </gazebo>
 
-
-    <!-- CASTER WHEEL LINK -->
-    <!-- WHEEL LINK == 1 -->
-
+    <!-- CASTER WHEEL 1 (Belakang Kiri) -->
     <joint name="caster1_wheel_joint" type="fixed">
         <parent link="chassis" />
         <child link="caster1_wheel" />
@@ -180,12 +176,11 @@
     </link>
     <gazebo reference="caster1_wheel">
         <material>Gazebo/Blue</material>
-        <mu1 value="0.001" />
-        <mu2 value="0.001" />
+        <mu1 value="0.0" />
+        <mu2 value="0.0" />
     </gazebo>
 
-    <!-- WHEEL LINK == 2 -->
-
+    <!-- CASTER WHEEL 2 (Belakang Kanan) -->
     <joint name="caster2_wheel_joint" type="fixed">
         <parent link="chassis" />
         <child link="caster2_wheel" />
@@ -209,16 +204,15 @@
     </link>
     <gazebo reference="caster2_wheel">
         <material>Gazebo/Blue</material>
-        <mu1 value="0.001" />
-        <mu2 value="0.001" />
+        <mu1 value="0.0" />
+        <mu2 value="0.0" />
     </gazebo>
 
-    <!-- WHEEL LINK == 3 -->
-
+    <!-- CASTER WHEEL 3 (Depan Kanan - masuk di bawah bodi 0.55 m) -->
     <joint name="caster3_wheel_joint" type="fixed">
         <parent link="chassis" />
         <child link="caster3_wheel" />
-        <origin xyz="0.65 -0.2 ${caster_wheel_offset_z}" />
+        <origin xyz="0.50 -0.2 ${caster_wheel_offset_z}" />
     </joint>
     <link name="caster3_wheel">
         <visual>
@@ -238,16 +232,15 @@
     </link>
     <gazebo reference="caster3_wheel">
         <material>Gazebo/Blue</material>
-        <mu1 value="0.001" />
-        <mu2 value="0.001" />
+        <mu1 value="0.0" />
+        <mu2 value="0.0" />
     </gazebo>
 
-    <!-- WHEEL LINK == 4 -->
-
+    <!-- CASTER WHEEL 4 (Depan Kiri - masuk di bawah bodi 0.55 m) -->
     <joint name="caster4_wheel_joint" type="fixed">
         <parent link="chassis" />
         <child link="caster4_wheel" />
-        <origin xyz="0.65 0.2 ${caster_wheel_offset_z}" />
+        <origin xyz="0.50 0.2 ${caster_wheel_offset_z}" />
     </joint>
     <link name="caster4_wheel">
         <visual>
@@ -267,8 +260,8 @@
     </link>
     <gazebo reference="caster4_wheel">
         <material>Gazebo/Blue</material>
-        <mu1 value="0.001" />
-        <mu2 value="0.001" />
+        <mu1 value="0.0" />
+        <mu2 value="0.0" />
     </gazebo>
 
 </robot>

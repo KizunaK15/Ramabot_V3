@@ -1,51 +1,61 @@
 import os
-
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler
+from launch.event_handlers import OnProcessStart
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 def generate_launch_description():
+    package_name = 'ramabot'
 
-    package_name = 'ramabot' 
+    default_world_path = os.path.join(
+        get_package_share_directory(package_name),
+        'worlds',
+        'maze.world'
+    )
 
+    world_arg = DeclareLaunchArgument(
+        'world',
+        default_value=default_world_path,
+        description='Path lengkap ke file SDF/world Gazebo'
+    )
+
+    gui_arg = DeclareLaunchArgument(
+        'gui',
+        default_value='true',
+        description='Set ke "false" untuk mode headless'
+    )
+
+    # 1. Include Robot State Publisher
     rsp = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(get_package_share_directory(package_name),'launch','rsp.launch.py')]),
-        launch_arguments={'use_sim_time':'true','use_ros2_control':'true'}.items()
+        PythonLaunchDescriptionSource([
+            os.path.join(get_package_share_directory(package_name), 'launch', 'rsp.launch.py')
+        ]),
+        launch_arguments={'use_sim_time': 'true'}.items()
     )
 
-    joystick = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(get_package_share_directory(package_name),'launch','joystick.launch.py')]), 
-        launch_arguments={'use_sim_time':'true'}.items()
-    )
-
-    twist_mux_params = os.path.join(get_package_share_directory(package_name),'config','twist_mux.yaml')
-    twist_mux = Node(
-        package="twist_mux",
-        executable="twist_mux",
-        parameters=[twist_mux_params, {'use_sim_time': True}],
-        remappings=[('/cmd_vel_out','/diff_cont/cmd_vel_unstamped')]
-    )
-
-    gazebo_params_file = os.path.join(get_package_share_directory(package_name),'config','gazebo_params.yaml')
-    gazebo_params_maps = os.path.join(get_package_share_directory(package_name),'worlds','rs_map.sdf')
-    #gazebo_params_maps = os.path.join(get_package_share_directory(package_name),'worlds','maze_map.sdf')
+    # 2. Include Gazebo Simulator
     gazebo = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(get_package_share_directory('gazebo_ros'),'launch','gazebo.launch.py')]),
+        PythonLaunchDescriptionSource([
+            os.path.join(get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')
+        ]),
         launch_arguments={
-            'extra_gazebo_args':'--ros-args --params-file ' + gazebo_params_file,
-            'world': gazebo_params_maps
-	}.items()
+            'world': LaunchConfiguration('world'),
+            'gui': LaunchConfiguration('gui')
+        }.items()
     )
 
+    # 3. Spawn Robot Model ke Gazebo
     spawn_entity = Node(
-        package='gazebo_ros', 
+        package='gazebo_ros',
         executable='spawn_entity.py',
-        arguments=['-topic','robot_description','-entity','my_bot'],
+        arguments=['-topic', 'robot_description', '-entity', 'ramabot'],
         output='screen'
     )
 
+    # 4. Spawner Controller untuk Joint State & Diff Drive
     diff_drive_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -58,15 +68,27 @@ def generate_launch_description():
         arguments=["joint_broad"]
     )
 
+    # Delay pengaktifan spawner hingga entity robot berhasil di-spawn di Gazebo
+    delayed_diff_drive_spawner = RegisterEventHandler(
+        event_handler=OnProcessStart(
+            target_action=spawn_entity,
+            on_start=[diff_drive_spawner]
+        )
+    )
 
-    # Launch them all!
+    delayed_joint_broad_spawner = RegisterEventHandler(
+        event_handler=OnProcessStart(
+            target_action=spawn_entity,
+            on_start=[joint_broad_spawner]
+        )
+    )
+
     return LaunchDescription([
+        world_arg,
+        gui_arg,
         rsp,
-        joystick,
-        twist_mux,
         gazebo,
         spawn_entity,
-        diff_drive_spawner,
-        joint_broad_spawner
-
+        delayed_diff_drive_spawner,
+        delayed_joint_broad_spawner
     ])

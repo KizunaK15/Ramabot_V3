@@ -4,10 +4,10 @@
     <gazebo>
         <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
 
-            <!-- Wheel Information -->
+            <!-- Wheel Information (sesuai wheel_offset_y = 0.205 -> 0.41 m) -->
             <left_joint>left_wheel_joint</left_joint>
             <right_joint>right_wheel_joint</right_joint>
-            <wheel_separation>0.40</wheel_separation>
+            <wheel_separation>0.41</wheel_separation>
             <wheel_diameter>0.15</wheel_diameter>
 
             <!-- Limits -->

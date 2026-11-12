@@ -39,6 +39,7 @@ install(DIRECTORY
   launch
   map
   rviz
+  scripts
   worlds
   DESTINATION share/${PROJECT_NAME}
 )
@@ -49,4 +50,11 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}
   RENAME serial_to_cmd_vel
 )
+
+install(PROGRAMS
+  scripts/joystick_bridge_sim.py
+  DESTINATION lib/${PROJECT_NAME}
+  RENAME joystick_bridge_sim
+)
+
 ament_package()
